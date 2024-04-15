@@ -11,6 +11,8 @@ num_epochs = 20
 
 
 def combined_loss(outputs, labels):
+    # print(outputs)
+    # print(labels)
     (
         style,
         score,
@@ -23,17 +25,20 @@ def combined_loss(outputs, labels):
     ) = outputs
     # Assuming labels are stored as a tuple:
     # (style, score, is_multi_object, is_weird, is_scene, is_figure, is_transparent, density)
-    (
-        style_labels,
-        score_labels,
-        is_multi_object_labels,
-        is_weird_labels,
-        is_scene_labels,
-        is_figure_labels,
-        is_transparent_labels,
-        density_labels,
-    ) = labels
+    # Cast categorical labels to long and binary labels to float
+    style_labels = labels[:, 0].long()  # Assuming first label is style
+    print(style_labels)
+    score_labels = labels[:, 1].long()  # Assuming second label is score
+    density_labels = labels[:, 7].long()  # Adjust index as necessary
 
+    # Binary labels
+    is_multi_object_labels = labels[:, 2].float()  # Adjust index as necessary
+    is_weird_labels = labels[:, 3].float()
+    is_scene_labels = labels[:, 4].float()
+    is_figure_labels = labels[:, 5].float()
+    is_transparent_labels = labels[:, 6].float()
+    # print("style: ", style)
+    # print("style labels: ", style_labels)
     loss_style = criterion_style_score(style, style_labels)
     loss_score = criterion_style_score(score, score_labels)
     loss_density = criterion_style_score(density, density_labels)
@@ -70,6 +75,7 @@ for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0
     for images, labels in train_loader:
+        # print(labels)
         optimizer.zero_grad()
         outputs = model(images)
         loss = combined_loss(outputs, labels)

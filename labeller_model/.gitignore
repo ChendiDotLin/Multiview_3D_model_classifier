@@ -1,2 +1,9 @@
 *.glb
 *.png
+__pycache_
+*.txt
+*.csv
+transformed_data/
+*.pyc
+_*
+._*

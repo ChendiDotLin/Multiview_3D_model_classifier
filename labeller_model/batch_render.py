@@ -2,7 +2,7 @@ import subprocess
 import os
 
 # Folder containing the objects
-object_folder = "test_model"
+object_folder = "training_data_models"
 
 # List all files in the folder
 object_files = os.listdir(object_folder)
@@ -27,7 +27,7 @@ for obj in object_files:
         "--num_images",
         "40",
         "--camera_dist",
-        "1.2"
+        "1.2",
     ]
 
     # Run the Blender command
