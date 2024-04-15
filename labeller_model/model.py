@@ -7,7 +7,7 @@ class MultiView3DModelClassifier(nn.Module):
     def __init__(self):
         super(MultiView3DModelClassifier, self).__init__()
         # Use ResNet50 pretrained on ImageNet for feature extraction
-        resnet = models.resnet50(pretrained=True)
+        resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
         self.feature_extractor = nn.Sequential(*list(resnet.children())[:-1])
         # Disable training for the feature extractor
         for param in self.feature_extractor.parameters():

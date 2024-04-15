@@ -26,32 +26,71 @@ import lmdb
 import pickle
 from PIL import Image
 import io
+import torch
 
 
 class LMDBDataset(Dataset):
-    def __init__(self, lmdb_path, transform=None):
+    def __init__(self, lmdb_path, uids, transform=None):
         self.lmdb_path = lmdb_path
+        self.uids = uids
         self.transform = transform
-        self.db = lmdb.open(
-            lmdb_path, readonly=True, lock=False, readahead=False, meminit=False
-        )
-        with self.db.begin(write=False) as txn:
-            self.length = txn.stat()["entries"]
+        # self.env = lmdb.open(
+        #     self.lmdb_path,
+        #     readonly=True,
+        #     max_readers=64,
+        #     lock=False,
+        #     readahead=False,
+        #     meminit=False,
+        # )
+        # with self.env.begin(write=False) as txn:
+        #     self.length = txn.stat()["entries"]
 
     def __len__(self):
-        return self.length
+        # return self.length
+        with lmdb.open(self.lmdb_path, readonly=True) as env:
+            with env.begin(write=False) as txn:
+                return txn.stat()["entries"]
 
     def __getitem__(self, index):
-        with self.db.begin(write=False) as txn:
-            key = f"key_{index}".encode("ascii")
-            data = txn.get(key)
-        image_data, label = pickle.loads(data)
-        image = Image.open(io.BytesIO(image_data))
+        uid = self.uids[index]  # Get the UID corresponding to the index
+        # with self.env.begin(write=False) as txn:
+        #     # Assuming keys are stored as bytes, and index starts at 0
+        #     key = uid.encode("ascii")
+        #     value = txn.get(key)
 
+        #     if value is None:
+        #         print(
+        #             f"Data not found for key {key}. Check key format and data integrity in the LMDB database."
+        #         )
+
+        #     image_data_list, label = pickle.loads(value)
+        #     images = [
+        #         Image.open(io.BytesIO(img_data)).convert("RGB")
+        #         for img_data in image_data_list
+        #     ]
+
+        #     if self.transform:
+        #         images = [self.transform(img) for img in images]
+
+        #     imgs_tensor = torch.stack(images)  # Stack images into a tensor
+        #     return imgs_tensor, label
+        with lmdb.open(self.lmdb_path, readonly=True) as env:
+            with env.begin(write=False) as txn:
+                key = f"{uid}".encode("ascii")
+                value = txn.get(key)
+        if not value:
+            raise ValueError("Could not retrieve data - key not found in LMDB.")
+
+        image_data_list, label = pickle.loads(value)
+        images = [
+            Image.open(io.BytesIO(img_data)).convert("RGB")
+            for img_data in image_data_list
+        ]
         if self.transform:
-            image = self.transform(image)
+            images = [self.transform(img) for img in images]
+        imgs_tensor = torch.stack(images)
 
-        return image, label
+        return imgs_tensor, label
 
     def __del__(self):
-        self.db.close()
+        self.env.close()

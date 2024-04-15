@@ -3,8 +3,8 @@
 __pycache_
 *.txt
 *.csv
-transformed_data/
 *.pyc
 _*
 ._*
 .DS_Store
+transformed_data/

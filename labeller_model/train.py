@@ -2,12 +2,18 @@ import torch.nn as nn
 import torch
 from model import MultiView3DModelClassifier
 from data_loader import get_loaders
+from tqdm import tqdm  # Import the tqdm function
+import os
+import multiprocessing as mp
+
+model_save_path = "./saved_models"  # Define the directory to save the models
+os.makedirs(model_save_path, exist_ok=True)  # Ensure the directory exists
 
 criterion_style_score = nn.CrossEntropyLoss()
 criterion_binary = (
     nn.BCEWithLogitsLoss()
 )  # This expects logits as input; sigmoid is included inside
-num_epochs = 20
+num_epochs = 50
 
 
 def combined_loss(outputs, labels):
@@ -27,7 +33,6 @@ def combined_loss(outputs, labels):
     # (style, score, is_multi_object, is_weird, is_scene, is_figure, is_transparent, density)
     # Cast categorical labels to long and binary labels to float
     style_labels = labels[:, 0].long()  # Assuming first label is style
-    print(style_labels)
     score_labels = labels[:, 1].long()  # Assuming second label is score
     density_labels = labels[:, 7].long()  # Adjust index as necessary
 
@@ -65,25 +70,41 @@ def combined_loss(outputs, labels):
     return total_loss
 
 
-model = MultiView3DModelClassifier()
+def train(train_loader):
+    for epoch in range(num_epochs):
+        model.train()
+        running_loss = 0.0
+        progress_bar = tqdm(
+            train_loader, desc=f"Epoch {epoch+1}/{num_epochs}", leave=False
+        )
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+        for images, labels in progress_bar:
+            optimizer.zero_grad()
+            outputs = model(images)
+            loss = combined_loss(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            running_loss += loss.item()
+            # Optionally update the progress bar description to show the running loss
+            progress_bar.set_description(
+                f"Epoch {epoch+1} - Loss: {running_loss / (progress_bar.n + 1)}"
+            )
 
-train_loader, test_loader = get_loaders()
+        print(f"Epoch {epoch+1}, Loss: {running_loss/len(train_loader)}")
+        # Save the model
+        model_filename = f"model_epoch_{epoch+1}.pth"  # Naming the model file
+        save_path = os.path.join(model_save_path, model_filename)
+        torch.save(model.state_dict(), save_path)
+        print(f"Saved model to {save_path}")
+    # Saving the model's state dictionary
+    # torch.save(model.state_dict(), "model.pth")
 
-for epoch in range(num_epochs):
-    model.train()
-    running_loss = 0.0
-    for images, labels in train_loader:
-        # print(labels)
-        optimizer.zero_grad()
-        outputs = model(images)
-        loss = combined_loss(outputs, labels)
-        loss.backward()
-        optimizer.step()
-        running_loss += loss.item()
 
-    print(f"Epoch {epoch+1}, Loss: {running_loss/len(train_loader)}")
+if __name__ == "__main__":
+    mp.freeze_support()  # Only necessary if the program might be frozen, e.g., with PyInstaller
+    model = MultiView3DModelClassifier()
 
-# Saving the model's state dictionary
-torch.save(model.state_dict(), "model.pth")
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+    train_loader, test_loader = get_loaders()
+    train(train_loader)
