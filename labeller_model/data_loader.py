@@ -12,6 +12,7 @@ def get_loaders():
     transformed_dataset = LMDBDataset("transformed_data")
     # Assuming 'transformed_dataset' is an instance of your dataset
     total_size = len(transformed_dataset)
+    print("total number of training data: ", total_size)
     train_size = int(total_size * 0.8)  # 80% for training
     test_size = total_size - train_size  # Remaining for test
 

@@ -88,6 +88,11 @@ def create_lmdb_dataset(source_folder, lmdb_path, all_labels):
         pbar = tqdm(total=len(all_labels), desc="Creating LMDB Dataset", unit="item")
         for idx, (uid, labels) in enumerate(all_labels.items()):
             img_folder = os.path.join(source_folder, uid)
+            # Check if the image folder exists
+            if not os.path.exists(img_folder):
+                # Handle the case where the image folder doesn't exist
+                print(f"Image folder does not exist: {img_folder}")
+                continue
             images = sorted(glob.glob(f"{img_folder}/*.png"))
             for img_path in images:
                 img = Image.open(img_path)
