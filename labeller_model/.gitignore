@@ -7,3 +7,4 @@ transformed_data/
 *.pyc
 _*
 ._*
+.DS_Store
