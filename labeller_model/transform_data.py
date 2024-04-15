@@ -126,6 +126,7 @@ def load_labels_from_csv(csv_file):
 csv_file_path = "training_label.csv"
 labels = load_labels_from_csv(csv_file_path)
 print("finish loading labels")
+
 # Define your transform
 transform = transforms.Compose(
     [
@@ -134,18 +135,9 @@ transform = transforms.Compose(
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ]
 )
-
-
-# # Instantiate your dataset
-# dataset = MultiView3DDataset(root_dir="views", labels=labels, transform=transform)
-# # Instantiate DataLoader
-# train_loader = DataLoader(dataset, batch_size=4, shuffle=True, num_workers=4)
-
-# # Specify the directory where you want to save the transformed dataset
-# save_dir = "./transformed_data"
-# save_transformed_dataset(dataset, save_dir)
-
 print("finish transformation")
+
+# Instantiate your dataset
 create_lmdb_dataset(
     source_folder="views", lmdb_path="./transformed_data", all_labels=labels
 )
