@@ -44,17 +44,18 @@ class LMDBDataset(Dataset):
         # )
         # with self.env.begin(write=False) as txn:
         #     self.length = txn.stat()["entries"]
-        self.env = lmdb.open(self.lmdb_path, readonly=True, lock=False)
+        # self.env = lmdb.open(self.lmdb_path, readonly=True, lock=False)
         self.uids = self._load_uids()
 
     def _load_uids(self):
         uids = []
-        with self.env.begin(write=False) as txn:
-            cursor = txn.cursor()
-            for key, _ in cursor:
-                uids.append(
-                    key.decode("utf-8")
-                )  # assuming keys are bytes, decode as needed
+        with lmdb.open(self.lmdb_path, readonly=True) as env:
+            with env.begin(write=False) as txn:
+                cursor = txn.cursor()
+                for key, _ in cursor:
+                    uids.append(
+                        key.decode("utf-8")
+                    )  # assuming keys are bytes, decode as needed
         return uids
 
     def __len__(self):
