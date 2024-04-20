@@ -42,6 +42,9 @@ def create_lmdb_dataset(source_folder, lmdb_path, all_labels):
                 )  # Save image data as byte array
             key = uid.encode("ascii")  # Use uid as key
             labels_values = [int(label) for label in labels]
+            if len(labels_values) != 8:
+                print("bad data uid: ", uid)
+                continue
             labels_tensor = torch.tensor(labels_values)
             value = pickle.dumps((img_list, labels_tensor))
             txn.put(key, value)

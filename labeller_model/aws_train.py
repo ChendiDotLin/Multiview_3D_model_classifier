@@ -5,6 +5,8 @@ from data_loader import get_loaders
 from tqdm import tqdm  # Import the tqdm function
 import os
 import multiprocessing as mp
+import boto3
+
 
 criterion_style_score = nn.CrossEntropyLoss()
 criterion_binary = (
@@ -67,8 +69,8 @@ def combined_loss(outputs, labels):
     return total_loss
 
 
-def train(train_loader):
-    for epoch in range(10, num_epochs):
+def train(train_loader, s3, bucket_name):
+    for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
         progress_bar = tqdm(
@@ -90,9 +92,13 @@ def train(train_loader):
         print(f"Epoch {epoch+1}, Loss: {running_loss/len(train_loader)}")
         # Save the model
         model_filename = f"model_epoch_{epoch+1}.pth"  # Naming the model file
-        save_path = os.path.join(model_save_path, model_filename)
-        torch.save(model.state_dict(), save_path)
-        print(f"Saved model to {save_path}")
+
+        # Upload the file
+        s3.upload_file(
+            model_filename, bucket_name, f"saved_models/model_epoch_{epoch+1}.pth"
+        )
+        print(f"Saved model to {bucket_name}")
+
     # Saving the model's state dictionary
     # torch.save(model.state_dict(), "model.pth")
 
@@ -102,11 +108,17 @@ if __name__ == "__main__":
     model_save_path = "./saved_models"  # Define the directory to save the models
     os.makedirs(model_save_path, exist_ok=True)  # Ensure the directory exists
 
-    model = MultiView3DModelClassifier()
+    model = MultiView3DModelClassifier(num_layers=2)
     # Load the saved state dictionary
-    model.load_state_dict(torch.load("saved_models/model_epoch_10.pth"))
+    # model.load_state_dict(torch.load("saved_models/model_epoch_10.pth"))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
+    # Initialize a session using your credentials
+    s3 = boto3.client("s3")
+
+    # Specify your bucket name and file path
+    bucket_name = "your-bucket-name"
+
     train_loader, test_loader = get_loaders()
-    train(train_loader)
+    train(train_loader, s3, bucket_name)

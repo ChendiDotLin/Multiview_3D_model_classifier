@@ -4,7 +4,7 @@ from torchvision import models, transforms
 
 
 class MultiView3DModelClassifier(nn.Module):
-    def __init__(self):
+    def __init__(self, num_layers=1):
         super(MultiView3DModelClassifier, self).__init__()
         # Use ResNet50 pretrained on ImageNet for feature extraction
         resnet = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
@@ -15,7 +15,7 @@ class MultiView3DModelClassifier(nn.Module):
 
         # RNN (LSTM) for processing the sequential features
         self.rnn = nn.LSTM(
-            input_size=2048, hidden_size=512, num_layers=1, batch_first=True
+            input_size=2048, hidden_size=512, num_layers=num_layers, batch_first=True
         )
 
         # Classification heads

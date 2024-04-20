@@ -18,15 +18,15 @@ def get_loaders():
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )
-    csv_file_path = "training_label.csv"
-    labels = return_filtered_labels(csv_file_path)
-    # import itertools
+    # csv_file_path = "training_label.csv"
+    # labels = return_filtered_labels(csv_file_path)
+    # # import itertools
 
-    # out = dict(itertools.islice(labels.items(), 3))
-    # uids = list(out.keys())
-    uids = list(labels.keys())
+    # # out = dict(itertools.islice(labels.items(), 3))
+    # # uids = list(out.keys())
+    # uids = list(labels.keys())
     # Instantiate your dataset
-    transformed_dataset = LMDBDataset("transformed_data", uids, transform)
+    transformed_dataset = LMDBDataset("transformed_data", transform)
     # Assuming 'transformed_dataset' is an instance of your dataset
     total_size = len(transformed_dataset)
     print("total number of training data: ", total_size)
@@ -44,7 +44,7 @@ def get_loaders():
         train_dataset, batch_size=8, shuffle=True, num_workers=4, pin_memory=True
     )
     test_loader = DataLoader(
-        test_dataset, batch_size=8, shuffle=False, num_workers=4, pin_memory=True
+        test_dataset, batch_size=8, shuffle=False, num_workers=0, pin_memory=True
     )
 
     return train_loader, test_loader

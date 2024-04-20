@@ -31,6 +31,11 @@ def return_filtered_labels(csv_file_path):
             # print(uid)
             exclude_labels.add(uid)
             continue
+        # print(len(labels))
+        if len(labels) != 8:
+            # print(uid)
+            exclude_labels.add(uid)
+            continue
 
     true_labels = {}
     with open(csv_file_path, mode="r") as file:
@@ -44,4 +49,5 @@ def return_filtered_labels(csv_file_path):
     return true_labels
 
 
-return_filtered_labels("training_label.csv")
+true_labels = return_filtered_labels("training_label.csv")
+# print(len(true_labels))

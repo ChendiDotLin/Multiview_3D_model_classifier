@@ -8,3 +8,4 @@ _*
 ._*
 .DS_Store
 transformed_data/
+*.pth

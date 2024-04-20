@@ -30,9 +30,9 @@ import torch
 
 
 class LMDBDataset(Dataset):
-    def __init__(self, lmdb_path, uids, transform=None):
+    def __init__(self, lmdb_path, transform=None):
         self.lmdb_path = lmdb_path
-        self.uids = uids
+        # self.uids = uids
         self.transform = transform
         # self.env = lmdb.open(
         #     self.lmdb_path,
@@ -44,6 +44,18 @@ class LMDBDataset(Dataset):
         # )
         # with self.env.begin(write=False) as txn:
         #     self.length = txn.stat()["entries"]
+        self.env = lmdb.open(self.lmdb_path, readonly=True, lock=False)
+        self.uids = self._load_uids()
+
+    def _load_uids(self):
+        uids = []
+        with self.env.begin(write=False) as txn:
+            cursor = txn.cursor()
+            for key, _ in cursor:
+                uids.append(
+                    key.decode("utf-8")
+                )  # assuming keys are bytes, decode as needed
+        return uids
 
     def __len__(self):
         # return self.length
@@ -89,7 +101,8 @@ class LMDBDataset(Dataset):
         if self.transform:
             images = [self.transform(img) for img in images]
         imgs_tensor = torch.stack(images)
-
+        if len(label) != 8:
+            print("uid: ", uid)
         return imgs_tensor, label
 
     def __del__(self):
