@@ -118,7 +118,7 @@ if __name__ == "__main__":
     s3 = boto3.client("s3")
 
     # Specify your bucket name and file path
-    bucket_name = "your-bucket-name"
+    bucket_name = "2000-training-data-3d-classifier"
 
     train_loader, test_loader = get_loaders()
     train(train_loader, s3, bucket_name)

@@ -38,17 +38,17 @@ class MultiView3DModelClassifier(nn.Module):
         features = features.view(batch_size, num_views, -1)
 
         # RNN
-        _, (hn, _) = self.rnn(features)
+        rnn_out, (hn, _) = self.rnn(features)
 
         # Predictions
-        style = self.style_head(hn.squeeze(0))
-        score = self.score_head(hn.squeeze(0))
-        is_multi_object = torch.sigmoid(self.multi_object_head(hn.squeeze(0)))
-        is_weird = torch.sigmoid(self.weird_head(hn.squeeze(0)))
-        is_scene = torch.sigmoid(self.scene_head(hn.squeeze(0)))
-        is_figure = torch.sigmoid(self.figure_head(hn.squeeze(0)))
-        is_transparent = torch.sigmoid(self.transparent_head(hn.squeeze(0)))
-        density = torch.sigmoid(self.density_head(hn.squeeze(0)))
+        style = self.style_head(rnn_out[:, -1, :])
+        score = self.score_head(rnn_out[:, -1, :])
+        is_multi_object = torch.sigmoid(self.multi_object_head(rnn_out[:, -1, :]))
+        is_weird = torch.sigmoid(self.weird_head(rnn_out[:, -1, :]))
+        is_scene = torch.sigmoid(self.scene_head(rnn_out[:, -1, :]))
+        is_figure = torch.sigmoid(self.figure_head(rnn_out[:, -1, :]))
+        is_transparent = torch.sigmoid(self.transparent_head(rnn_out[:, -1, :]))
+        density = torch.sigmoid(self.density_head(rnn_out[:, -1, :]))
 
         return (
             style,
