@@ -107,4 +107,5 @@ class LMDBDataset(Dataset):
         return imgs_tensor, label
 
     def __del__(self):
-        self.env.close()
+        if hasattr(self, "env") and self.env is not None:
+            self.env.close()

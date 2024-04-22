@@ -92,7 +92,7 @@ def train(train_loader, s3, bucket_name):
 
         print(f"Epoch {epoch+1}, Loss: {running_loss/len(train_loader)}")
         # Save the model
-        model_filename = f"model_epoch_{epoch+1}.pth"  # Naming the model file
+        model_filename = "last_epoch.pth"  # Naming the model file
         save_path = os.path.join(model_save_path, model_filename)
         torch.save(model.state_dict(), save_path)
 
