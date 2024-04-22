@@ -43,12 +43,12 @@ class MultiView3DModelClassifier(nn.Module):
         # Predictions
         style = self.style_head(rnn_out[:, -1, :])
         score = self.score_head(rnn_out[:, -1, :])
-        is_multi_object = torch.sigmoid(self.multi_object_head(rnn_out[:, -1, :]))
-        is_weird = torch.sigmoid(self.weird_head(rnn_out[:, -1, :]))
-        is_scene = torch.sigmoid(self.scene_head(rnn_out[:, -1, :]))
-        is_figure = torch.sigmoid(self.figure_head(rnn_out[:, -1, :]))
-        is_transparent = torch.sigmoid(self.transparent_head(rnn_out[:, -1, :]))
-        density = torch.sigmoid(self.density_head(rnn_out[:, -1, :]))
+        is_multi_object = self.multi_object_head(rnn_out[:, -1, :])
+        is_weird = self.weird_head(rnn_out[:, -1, :])
+        is_scene = self.scene_head(rnn_out[:, -1, :])
+        is_figure = self.figure_head(rnn_out[:, -1, :])
+        is_transparent = self.transparent_head(rnn_out[:, -1, :])
+        density = self.density_head(rnn_out[:, -1, :])
 
         return (
             style,

@@ -32,7 +32,7 @@ if __name__ == "__main__":
     _, test_loader = get_loaders()
 
     model = MultiView3DModelClassifier()
-    model.load_state_dict(torch.load("saved_models/model_epoch_10.pth"))
+    model.load_state_dict(torch.load("saved_models/model_epoch_33.pth"))
     model.eval()
 
     # No gradient calculation is needed
