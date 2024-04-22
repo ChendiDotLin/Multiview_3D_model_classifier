@@ -49,7 +49,7 @@ class LMDBDataset(Dataset):
 
     def _load_uids(self):
         uids = []
-        with lmdb.open(self.lmdb_path, readonly=True) as env:
+        with lmdb.open(self.lmdb_path, readonly=True, lock=False) as env:
             with env.begin(write=False) as txn:
                 cursor = txn.cursor()
                 for key, _ in cursor:
@@ -60,7 +60,7 @@ class LMDBDataset(Dataset):
 
     def __len__(self):
         # return self.length
-        with lmdb.open(self.lmdb_path, readonly=True) as env:
+        with lmdb.open(self.lmdb_path, readonly=True, lock=False) as env:
             with env.begin(write=False) as txn:
                 return txn.stat()["entries"]
 
@@ -87,7 +87,7 @@ class LMDBDataset(Dataset):
 
         #     imgs_tensor = torch.stack(images)  # Stack images into a tensor
         #     return imgs_tensor, label
-        with lmdb.open(self.lmdb_path, readonly=True) as env:
+        with lmdb.open(self.lmdb_path, readonly=True, lock=False) as env:
             with env.begin(write=False) as txn:
                 key = f"{uid}".encode("ascii")
                 value = txn.get(key)

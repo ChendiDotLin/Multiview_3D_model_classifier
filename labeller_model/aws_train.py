@@ -78,6 +78,7 @@ def train(train_loader, s3, bucket_name):
         )
 
         for images, labels in progress_bar:
+            images, labels = images.cuda(), labels.cuda()
             optimizer.zero_grad()
             outputs = model(images)
             loss = combined_loss(outputs, labels)
@@ -110,7 +111,7 @@ if __name__ == "__main__":
     model_save_path = "./saved_models"  # Define the directory to save the models
     os.makedirs(model_save_path, exist_ok=True)  # Ensure the directory exists
 
-    model = MultiView3DModelClassifier(num_layers=2)
+    model = MultiView3DModelClassifier(num_layers=2).cuda()
     # Load the saved state dictionary
     # model.load_state_dict(torch.load("saved_models/model_epoch_10.pth"))
 
