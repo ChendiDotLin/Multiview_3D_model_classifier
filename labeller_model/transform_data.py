@@ -8,9 +8,22 @@ import io
 from tqdm import tqdm
 import shutil
 from find_missing_data import return_filtered_labels
+import csv
 
 
-def create_lmdb_dataset(source_folder, lmdb_path, all_labels):
+def load_metadata_from_csv(csv_file):
+    metadata = {}
+    with open(csv_file, mode="r") as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip the first line, which is the header
+        for row in reader:
+            uid = row[0]
+            metadata[uid] = tuple(row[1:])  # Adjust the slicing if necessary
+            # print(metadata[uid])
+    return metadata
+
+
+def create_lmdb_dataset(source_folder, lmdb_path, all_labels, all_metadata):
     # If the database directory already exists, remove it
     if os.path.exists(lmdb_path):
         shutil.rmtree(lmdb_path)  # Use shutil.rmtree to delete an entire directory tree
@@ -46,7 +59,11 @@ def create_lmdb_dataset(source_folder, lmdb_path, all_labels):
                 print("bad data uid: ", uid)
                 continue
             labels_tensor = torch.tensor(labels_values)
-            value = pickle.dumps((img_list, labels_tensor))
+            metadata = all_metadata[uid]
+            metadata_values = [int(m) for m in metadata]
+            # print(metadata_values)
+            metadata_tensor = torch.tensor(metadata_values)
+            value = pickle.dumps((img_list, labels_tensor, metadata_tensor))
             txn.put(key, value)
             # Update the progress bar
             pbar.update(1)
@@ -58,10 +75,13 @@ def create_lmdb_dataset(source_folder, lmdb_path, all_labels):
 csv_file_path = "training_label.csv"
 labels = return_filtered_labels(csv_file_path)
 print("finish loading labels")
-
+all_metadata = load_metadata_from_csv("model_metadata.csv")
 # Instantiate your dataset
 create_lmdb_dataset(
-    source_folder="views", lmdb_path="./transformed_data", all_labels=labels
+    source_folder="views",
+    lmdb_path="./transformed_data",
+    all_labels=labels,
+    all_metadata=all_metadata,
 )
 print("finish creating lmdb")
 # Assuming labels are stored as a tuple:

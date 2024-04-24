@@ -68,16 +68,16 @@ def combined_loss(outputs, labels):
 
 
 def train(train_loader):
-    for epoch in range(10, num_epochs):
+    for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
         progress_bar = tqdm(
             train_loader, desc=f"Epoch {epoch+1}/{num_epochs}", leave=False
         )
 
-        for images, labels in progress_bar:
+        for images, labels, metadata in progress_bar:
             optimizer.zero_grad()
-            outputs = model(images)
+            outputs = model(images, metadata)
             loss = combined_loss(outputs, labels)
             loss.backward()
             optimizer.step()
@@ -104,7 +104,7 @@ if __name__ == "__main__":
 
     model = MultiView3DModelClassifier()
     # Load the saved state dictionary
-    model.load_state_dict(torch.load("saved_models/model_epoch_10.pth"))
+    # model.load_state_dict(torch.load("saved_models/model_epoch_10.pth"))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 

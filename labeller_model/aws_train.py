@@ -77,10 +77,10 @@ def train(train_loader, s3, bucket_name):
             train_loader, desc=f"Epoch {epoch+1}/{num_epochs}", leave=False
         )
 
-        for images, labels in progress_bar:
-            images, labels = images.cuda(), labels.cuda()
+        for images, labels, metadata in progress_bar:
+            images, labels, metadata = images.cuda(), labels.cuda(), metadata.cuda()
             optimizer.zero_grad()
-            outputs = model(images)
+            outputs = model(images, metadata)
             loss = combined_loss(outputs, labels)
             loss.backward()
             optimizer.step()

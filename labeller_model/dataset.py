@@ -94,7 +94,7 @@ class LMDBDataset(Dataset):
         if not value:
             raise ValueError("Could not retrieve data - key not found in LMDB.")
 
-        image_data_list, label = pickle.loads(value)
+        image_data_list, label, metadata = pickle.loads(value)
         images = [
             Image.open(io.BytesIO(img_data)).convert("RGB")
             for img_data in image_data_list
@@ -104,7 +104,7 @@ class LMDBDataset(Dataset):
         imgs_tensor = torch.stack(images)
         if len(label) != 8:
             print("uid: ", uid)
-        return imgs_tensor, label
+        return imgs_tensor, label, metadata
 
     def __del__(self):
         if hasattr(self, "env") and self.env is not None:

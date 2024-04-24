@@ -38,8 +38,8 @@ if __name__ == "__main__":
     # No gradient calculation is needed
     progress_bar = tqdm(test_loader, desc=f"test progress", leave=False)
     with torch.no_grad():
-        for images, labels in progress_bar:
-            outputs = model(images)
+        for images, labels, metadata in progress_bar:
+            outputs = model(images, metadata)
 
             # Assuming labels is a tuple in the same order as output_labels
             for i, label_name in enumerate(output_labels):
