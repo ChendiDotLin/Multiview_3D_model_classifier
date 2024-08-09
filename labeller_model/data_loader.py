@@ -26,7 +26,7 @@ def get_loaders():
     # # uids = list(out.keys())
     # uids = list(labels.keys())
     # Instantiate your dataset
-    transformed_dataset = LMDBDataset("transformed_data", transform)
+    transformed_dataset = LMDBDataset("10000_training_data", transform)
     # Assuming 'transformed_dataset' is an instance of your dataset
     total_size = len(transformed_dataset)
     print("total number of training data: ", total_size)
@@ -34,7 +34,7 @@ def get_loaders():
     test_size = total_size - train_size  # Remaining for test
     print("training data: ", train_size)
     print("test data: ", test_size)
-
+    # test_dataset = transformed_dataset
     train_dataset, test_dataset = random_split(
         transformed_dataset, [train_size, test_size]
     )
@@ -43,8 +43,9 @@ def get_loaders():
     train_loader = DataLoader(
         train_dataset, batch_size=8, shuffle=True, num_workers=4, pin_memory=True
     )
+    # train_loader = {}
     test_loader = DataLoader(
-        test_dataset, batch_size=8, shuffle=False, num_workers=0, pin_memory=True
+        test_dataset, batch_size=1, shuffle=False, num_workers=0, pin_memory=True
     )
 
     return train_loader, test_loader

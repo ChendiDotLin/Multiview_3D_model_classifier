@@ -1,10 +1,11 @@
 import torch.nn as nn
 import torch
-from model import MultiView3DModelClassifier
+from model import MultiView3DModelClassifier, MultiView3DModelClassifierWithAttention
 from data_loader import get_loaders
 from tqdm import tqdm  # Import the tqdm function
 import os
 import multiprocessing as mp
+
 
 criterion_style_score = nn.CrossEntropyLoss()
 criterion_binary = (
@@ -55,8 +56,8 @@ def combined_loss(outputs, labels):
     )
 
     total_loss = (
-        loss_style
-        + loss_score
+        3.0*loss_style
+        + 3.0*loss_score
         + loss_density
         + loss_multi_object
         + loss_weird
@@ -76,6 +77,7 @@ def train(train_loader):
         )
 
         for images, labels, metadata, _ in progress_bar:
+            images, labels, metadata = images.cuda(), labels.cuda(), metadata.cuda()
             optimizer.zero_grad()
             outputs = model(images, metadata)
             loss = combined_loss(outputs, labels)
@@ -89,10 +91,10 @@ def train(train_loader):
 
         print(f"Epoch {epoch+1}, Loss: {running_loss/len(train_loader)}")
         # Save the model
-        model_filename = f"model_epoch_{epoch+1}.pth"  # Naming the model file
+        model_filename = "last_epoch.pth"  # Naming the model file
         save_path = os.path.join(model_save_path, model_filename)
         torch.save(model.state_dict(), save_path)
-        print(f"Saved model to {save_path}")
+
     # Saving the model's state dictionary
     # torch.save(model.state_dict(), "model.pth")
 
@@ -102,11 +104,14 @@ if __name__ == "__main__":
     model_save_path = "./saved_models"  # Define the directory to save the models
     os.makedirs(model_save_path, exist_ok=True)  # Ensure the directory exists
 
-    model = MultiView3DModelClassifier()
+    # model = MultiView3DModelClassifier(num_layers=2).cuda()
+    model = MultiView3DModelClassifierWithAttention(num_layers=1).cuda()
+
     # Load the saved state dictionary
     # model.load_state_dict(torch.load("saved_models/model_epoch_10.pth"))
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
 
     train_loader, test_loader = get_loaders()
     train(train_loader)

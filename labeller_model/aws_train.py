@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch
-from model import MultiView3DModelClassifier
+from model import MultiView3DModelClassifier, MultiView3DModelClassifierWithAttention
 from data_loader import get_loaders
 from tqdm import tqdm  # Import the tqdm function
 import os
@@ -78,7 +78,7 @@ def train(train_loader, s3, bucket_name):
         )
 
         for images, labels, metadata in progress_bar:
-            images, labels, metadata = images.cuda(), labels.cuda(), metadata.cuda()
+            images, labels, metadata, _ = images.cuda(), labels.cuda(), metadata.cuda()
             optimizer.zero_grad()
             outputs = model(images, metadata)
             loss = combined_loss(outputs, labels)
@@ -111,7 +111,9 @@ if __name__ == "__main__":
     model_save_path = "./saved_models"  # Define the directory to save the models
     os.makedirs(model_save_path, exist_ok=True)  # Ensure the directory exists
 
-    model = MultiView3DModelClassifier(num_layers=2).cuda()
+    # model = MultiView3DModelClassifier(num_layers=2).cuda()
+    model = MultiView3DModelClassifierWithAttention(num_layers=2).cuda()
+
     # Load the saved state dictionary
     # model.load_state_dict(torch.load("saved_models/model_epoch_10.pth"))
 

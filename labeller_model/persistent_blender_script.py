@@ -491,18 +491,18 @@ def download_object(object_url: str) -> str:
 
 
 if __name__ == "__main__":
-    try:
-        start_i = time.time()
-        if args.object_path.startswith("http"):
-            local_path = download_object(args.object_path)
-        else:
-            local_path = args.object_path
-        save_images(local_path)
-        end_i = time.time()
-        print("Finished", local_path, "in", end_i - start_i, "seconds")
-        # delete the object if it was downloaded
-        if args.object_path.startswith("http"):
-            os.remove(local_path)
-    except Exception as e:
-        print("Failed to render", args.object_path)
-        print(e)
+    start_i = time.time()
+    local_path = args.object_path
+    # Get list of all GLB files in the directory
+    object_files = [f for f in os.listdir(local_path) if f.endswith('.glb')]
+    
+    for object_file in object_files:
+        object_path = os.path.join(local_path, object_file)
+        print(f"Processing {object_path}")
+        save_images(object_path)  # Render and save the image
+    end_i = time.time()
+    print("Finished", local_path, "in", end_i - start_i, "seconds")
+    # delete the object if it was downloaded
+    if args.object_path.startswith("http"):
+        os.remove(local_path)
+

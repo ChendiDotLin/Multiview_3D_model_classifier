@@ -10,3 +10,9 @@ _*
 transformed_data/
 *.pth
 saved_models/
+10000_training_data/
+objaverse/
+objaverse_models/
+mismatch/
+views/
+training_data_models

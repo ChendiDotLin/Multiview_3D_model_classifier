@@ -104,7 +104,7 @@ class LMDBDataset(Dataset):
         imgs_tensor = torch.stack(images)
         if len(label) != 8:
             print("uid: ", uid)
-        return imgs_tensor, label, metadata
+        return imgs_tensor, label, metadata, uid
 
     def __del__(self):
         if hasattr(self, "env") and self.env is not None:

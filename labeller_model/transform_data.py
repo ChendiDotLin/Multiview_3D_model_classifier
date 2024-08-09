@@ -72,14 +72,18 @@ def create_lmdb_dataset(source_folder, lmdb_path, all_labels, all_metadata):
 
 
 # Example usage:
-csv_file_path = "training_label.csv"
+csv_file_path = "10000_training_labels.csv"
 labels = return_filtered_labels(csv_file_path)
 print("finish loading labels")
-all_metadata = load_metadata_from_csv("model_metadata.csv")
+all_metadata = load_metadata_from_csv("10000_model_metadata.csv")
+cwd = os.getcwd()
+lmdb_path = cwd + "/transformed_data"
+source_folder = cwd + "/views"
+os.makedirs(lmdb_path, exist_ok=True)
 # Instantiate your dataset
 create_lmdb_dataset(
-    source_folder="views",
-    lmdb_path="./transformed_data",
+    source_folder=source_folder,
+    lmdb_path=lmdb_path,
     all_labels=labels,
     all_metadata=all_metadata,
 )

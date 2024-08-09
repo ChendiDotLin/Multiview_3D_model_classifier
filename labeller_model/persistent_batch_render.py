@@ -19,15 +19,15 @@ def flatten_directory(source_directory, target_dir):
 
 
 
-def render_object(obj, target_path, output_dir):
+def render_object(target_path, output_dir):
     command = [
         "/Applications/Blender.app/Contents/MacOS/Blender",
         "-b",
         "-P",
-        "blender_script.py",
+        "persistent_blender_script.py",
         "--",
         "--object_path",
-        os.path.join(target_path, obj),
+        target_path,
         "--output_dir",
         output_dir,
         "--engine",
@@ -56,11 +56,9 @@ if __name__ == "__main__":
     # object_folder = "training_data_models"
 
     # List all files in the folder
-    object_files = os.listdir(target_path)
     output_dir = cwd + "/views"
     os.makedirs(output_dir, exist_ok=True)
 
-    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
-         pool.starmap(render_object, [(obj, target_path, output_dir) for obj in object_files])
+    render_object(target_path, output_dir)
 
     # Command to run Blender with the specified options
