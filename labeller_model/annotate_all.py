@@ -61,6 +61,8 @@ if __name__ == "__main__":
             for images, labels, metadata, uid in progress_bar:
                 images, metadata = images.to(device), metadata.to(device)
                 outputs = model(images, metadata)
+                uid_clean = uid[0] if isinstance(uid, tuple) else uid  
+                # Assuming uid is the first element of a tuple
 
                 # Collect predictions for all labels
                 predictions = []
@@ -71,7 +73,7 @@ if __name__ == "__main__":
                         predictions.append(predicted.cpu().numpy()[0])  # Assuming batch size is 1
                     else:  # Binary labels
                         predicted = (torch.sigmoid(output.data) > 0.5).int()
-                        predictions.append(predicted.cpu().numpy()[0])
+                        predictions.append(predicted.view(-1).cpu().numpy()[0])
 
                 # Write predictions to CSV
-                writer.writerow([uid] + predictions)
+                writer.writerow([uid_clean] + predictions)
