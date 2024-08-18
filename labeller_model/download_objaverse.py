@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 import objaverse
+import shutil
+import os
+import csv
+import multiprocessing
 
 objaverse.__version__
 
@@ -60,8 +64,7 @@ if job_id < 9:
 else:
     random_object_uids = uids[800000:]
 
-import csv
-import os
+
 
 # from google.colab import files
 
@@ -95,7 +98,6 @@ with open(csv_path, mode="w", newline="") as file:
 We're going to use multiprocessing to download the objects. First, let's check our CPU count to get the number of processes we'll use:
 """
 
-import multiprocessing
 
 processes = multiprocessing.cpu_count()
 # processes
@@ -129,8 +131,7 @@ objects = objaverse.load_objects(uids=random_object_uids, download_processes=1)
 # os.rename("/root/.objaverse", "/root/objaverse")
 # Moving (renaming) the folder
 
-import shutil
-import os
+
 
 cwd = os.getcwd()
 new_dir = cwd + f"/objaverse_{job_id}"

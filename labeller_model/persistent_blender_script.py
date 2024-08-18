@@ -30,7 +30,7 @@ from mathutils import Vector, Matrix
 import numpy as np
 
 import bpy
-from mathutils import Vector
+import multiprocessing
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -494,9 +494,11 @@ if __name__ == "__main__":
     start_i = time.time()
     local_path = args.object_path
     # Get list of all GLB files in the directory
-    object_files = [f for f in os.listdir(local_path) if f.endswith('.glb')]
     
-    for object_file in object_files:
+   # Get the specific batch of objects to process
+    object_batch = os.environ.get('OBJECT_BATCH', '').split(',')
+    
+    for object_file in object_batch:
         object_path = os.path.join(local_path, object_file)
         print(f"Processing {object_path}")
         save_images(object_path)  # Render and save the image
