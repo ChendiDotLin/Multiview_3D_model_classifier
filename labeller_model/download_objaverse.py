@@ -49,21 +49,20 @@ annotations = objaverse.load_annotations()
 # random.seed(42)
 uids = objaverse.load_uids()
 # random_object_uids = random.sample(uids, 5)
-# with open("10000_random_sample.txt", "r") as file:
-#     # Read each line, strip whitespace, and add to the list
-#     random_object_uids = [line.strip() for line in file]
+with open("output_uids.txt", "r") as file:
+    # Read each line, strip whitespace, and add to the list
+    random_object_uids = [line.strip() for line in file]
 
 
 # """# Generate a file with sample's uid and its metadata"""
 
 # There are around 900000 models in objaverse. To ease the load
-# of each downloading job, we separate it into 9 sets of jobs.  
-job_id = 1 # 2, 3, 4, 5, 6, 7, 8, 9
-if job_id < 9: 
-    random_object_uids = uids[(job_id-1)*100000:job_id*100000]
-else:
-    random_object_uids = uids[800000:]
-
+# of each downloading job, we separate it into 9 sets of jobs.
+job_id = 1  # 2, 3, 4, 5, 6, 7, 8, 9
+# if job_id < 9:
+#     random_object_uids = uids[(job_id-1)*100000:job_id*100000]
+# else:
+#     random_object_uids = uids[800000:]
 
 
 # from google.colab import files
@@ -130,7 +129,6 @@ objects = objaverse.load_objects(uids=random_object_uids, download_processes=1)
 # import os
 # os.rename("/root/.objaverse", "/root/objaverse")
 # Moving (renaming) the folder
-
 
 
 cwd = os.getcwd()
